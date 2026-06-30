@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------------------------
+   KODE — premium light theme
+   Palette: warm ink + gold accent on soft paper
+---------------------------------------------------------------------------- */
+@theme {
+  --color-paper: #ffffff;
+  --color-cream: #faf9f7;
+  --color-sand: #f3f0ea;
+  --color-line: #e7e2d9;
+  --color-ink: #1c1917;
+  --color-ink-soft: #57534e;
+  --color-ink-mute: #8a8279;
+  --color-gold: #b7892f;
+  --color-gold-soft: #caa24f;
+  --color-gold-deep: #8a6520;
+  --color-success: #15803d;
+  --color-danger: #b91c1c;
+
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 1px 2px rgba(28, 25, 23, 0.04),
+    0 8px 24px rgba(28, 25, 23, 0.06);
+  --shadow-lift: 0 12px 40px rgba(28, 25, 23, 0.12);
+
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: #fff;
+}
+
+/* Custom scrollbar (desktop) */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d8d1c4;
+    border-radius: 9999px;
+    border: 2px solid var(--color-cream);
+  }
+}
+
+/* ---- Typographic helpers ---- */
+.font-display {
+  font-family: var(--font-display);
+}
+.tracking-luxe {
+  letter-spacing: 0.22em;
+}
+
+/* ---- Reveal animations ---- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s var(--ease-lux) both;
+}
+.animate-fade-in {
+  animation: fade-in 0.8s var(--ease-lux) both;
+}
+.animate-scale-in {
+  animation: scale-in 0.35s var(--ease-lux) both;
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+/* Scroll reveal — toggled by IntersectionObserver (data-reveal) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.8s var(--ease-lux), transform 0.8s var(--ease-lux);
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-sand) 25%,
+    #ece7de 37%,
+    var(--color-sand) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Form inputs */
+.kode-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  transition: border-color 0.2s var(--ease-lux), box-shadow 0.2s var(--ease-lux);
+}
+.kode-input::placeholder {
+  color: var(--color-ink-mute);
+}
+.kode-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(183, 137, 47, 0.16);
+}
+select.kode-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8279' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+/* Image hover zoom wrapper */
+.zoom-img {
+  transition: transform 0.7s var(--ease-lux);
+}
+.group:hover .zoom-img {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
