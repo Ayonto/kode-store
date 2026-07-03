@@ -1,0 +1,138 @@
+// KODE store — Prisma schema (MariaDB)
+// Money is stored as whole BDT (taka) integers to avoid floating/Decimal issues.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  imageUrl  String?   @db.Text
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  name            String
+  slug            String    @unique
+  description     String?   @db.Text
+  price           Int // whole BDT
+  discountPercent Int       @default(0) // 0-100
+  freeDelivery    Boolean   @default(false)
+  featured        Boolean   @default(false)
+  active          Boolean   @default(true)
+  images          Json? // string[]
+  sizes           Json? // string[] of orderable size labels
+  sizeChart       Json? // { columns: string[], rows: string[][] }
+  categoryId      Int?
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  orderItems      OrderItem[]
+
+  @@index([categoryId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderSource {
+  WEBSITE
+  INSTAGRAM
+  FACEBOOK
+  PHONE
+  OTHER
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  orderNumber    String      @unique
+  customerName   String
+  phone          String
+  address        String      @db.Text
+  city           String?
+  deliveryZone   String // "inside_dhaka" | "outside_dhaka"
+  notes          String?     @db.Text
+  subtotal       Int
+  deliveryCharge Int
+  total          Int
+  status         OrderStatus @default(PENDING)
+  source         OrderSource @default(WEBSITE)
+  verified       Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   Int?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName String
+  size        String?
+  unitPrice   Int
+  quantity    Int
+  lineTotal   Int
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Settings {
+  id                    Int      @id @default(1)
+  storeName             String   @default("KODE")
+  deliveryInsideDhaka   Int      @default(60)
+  deliveryOutsideDhaka  Int      @default(120)
+  freeDeliveryThreshold Int? // null/0 = disabled
+  currency              String   @default("৳")
+  updatedAt             DateTime @updatedAt
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// ---- Finance: spending / expense tracker (factory, materials, salaries…) ----
+
+model ExpenseCategory {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  color     String?   // hex chip colour for the UI, e.g. "#b7892f"
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  expenses  Expense[]
+}
+
+model Expense {
+  id          Int              @id @default(autoincrement())
+  date        DateTime // the day the money was spent
+  amount      Int // whole BDT (taka)
+  description String           @db.Text
+  spentBy     String // who spent it
+  categoryId  Int?
+  category    ExpenseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([date])
+}
