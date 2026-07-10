@@ -6,8 +6,7 @@ export default function AdminWelcome() {
       <PageHeader title="Dashboard" subtitle="Welcome to the KODE admin panel." />
       <Card>
         <p className="text-sm text-ink-soft">
-          Use the sidebar to manage your store. Live business metrics will land
-          here once the operations module ships in Sprint 4.
+          From here your business management begins! Welcome! 🗿
         </p>
       </Card>
     </>
